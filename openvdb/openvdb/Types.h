@@ -170,6 +170,9 @@ struct PointIndex
     template<typename T>
     PointIndex operator+(T x) { return PointIndex(mIndex + IntType(x)); }
 
+    template <typename T>
+    PointIndex operator+=(const T x) { mIndex += IntType(x); return *this; }
+
 private:
     IntType mIndex;
 };
