@@ -302,6 +302,30 @@ signedFloodFill(GridType& grid)
 
 ////////////////////////////////////////
 
+template<typename GridType>
+inline void
+signedFloodFill(GridType& grid)
+{
+    tools::signedFloodFill(grid.tree());
+}
+
+template<typename GridType>
+inline void
+filterGaussian(GridType& grid, int width, int iterations)
+{
+    tools::Filter<GridType> filter = tools::Filter<GridType>(grid);
+    filter.gaussian(width, iterations);
+}
+
+template<typename GridType>
+inline void
+filterMean(GridType& grid, int width, int iterations)
+{
+    tools::Filter<GridType> filter = tools::Filter<GridType>(grid);
+    filter.mean(width, iterations);
+}
+
+////////////////////////////////////////
 
 #ifndef PY_OPENVDB_USE_NUMPY
 
@@ -1540,6 +1564,18 @@ exportGrid(py::module_ m)
             "signedFloodFill()\n\n"
             "Propagate the sign from a narrow-band level set into inactive\n"
             "voxels and tiles.")
+        .def("filterGaussian", &pyGrid::filterGaussian<GridType>,
+            py::arg("width")=1, py::arg("iterations")=1,
+            "filterGaussian()\n\n"
+            "One iteration of a fast separable Gaussian filter.")
+        .def("filterMedian", &pyGrid::filterMedian<GridType>,
+            py::arg("width") = 1, py::arg("iterations") = 1,
+            "filterMedian()\n\n"
+            "   One iteration of a median-value filter.")
+        .def("filterMean", &pyGrid::filterMean<GridType>,
+            py::arg("width") = 1, py::arg("iterations") = 1,
+            "filterMean()\n\n"
+            "   One iteration of a mean-value filter.")
 
         .def("copyFromArray", &pyGrid::copyFromArray<GridType>,
             py::arg("array"), py::arg("ijk")=Coord(0,0,0),
