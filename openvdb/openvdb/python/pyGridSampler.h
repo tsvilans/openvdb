@@ -4,15 +4,23 @@
 #ifndef OPENVDB_PYGRIDSAMPLER_HAS_BEEN_INCLUDED
 #define OPENVDB_PYGRIDSAMPLER_HAS_BEEN_INCLUDED
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
+#include <nanobind/stl/function.h>
+#include <nanobind/stl/shared_ptr.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/tuple.h>
+#include <nanobind/ndarray.h>
+#include <nanobind/stl/optional.h>
+
 #include <openvdb/openvdb.h>
 #include <openvdb/tools/Interpolation.h>
 #include "pyutil.h"
 
 namespace pyGridSampler {
 
-    namespace py = pybind11;
+    namespace nb = nanobind;
     using namespace openvdb::OPENVDB_VERSION_NAME;
 
 
@@ -96,38 +104,38 @@ namespace pyGridSampler {
         }
 
         /// @brief Define a Python wrapper class for this C++ class.
-        static void wrap(py::module_ m)
+        static void wrap(nb::module_ m)
         {
             const std::string
                 pyGridTypeName = pyutil::GridTraits<GridType>::name(),
                 pyValueTypeName = openvdb::typeNameAsString<typename GridType::ValueType>(),
                 pyGridSamplerTypeName = Traits::name();
 
-            py::class_<GridSamplerWrap>(m,
+            nb::class_<GridSamplerWrap>(m,
                 (pyGridTypeName + pyGridSamplerTypeName).c_str(), //pybind11 requires a unique class name for each template instantiation
                 ("Class that provides the interface for continuous sampling of \nvalues in a "
                     + pyGridTypeName).c_str())
-                .def(py::init<const GridPtrType&>(), py::arg("grid"),
+                .def(nb::init<const GridPtrType&>(), nb::arg("grid"),
                     "Initialize with a grid to be sampled.")
                 .def("copy", &GridSamplerWrap::copy,
                     ("copy() -> " + pyGridSamplerTypeName + "\n\n"
                         "Return a copy of this grid sampler.").c_str())
-                .def_property_readonly("parent", &GridSamplerWrap::parent,
+                .def_prop_ro("parent", &GridSamplerWrap::parent,
                     ("this grid sampler's parent " + pyGridTypeName).c_str())
 
                 //
                 // Voxel access
                 //
                 .def("isSample", &GridSamplerWrap::isSample,
-                    py::arg("ijk"),
+                    nb::arg("ijk"),
                     ("isSample(ijk) -> " + pyValueTypeName + "\n\n"
                         "Return the index-space value at coordinates (i, j, k).").c_str())
                 .def("wsSample", &GridSamplerWrap::wsSample,
-                    py::arg("xyz"),
+                    nb::arg("xyz"),
                     ("wsSample(xyz) -> " + pyValueTypeName + "\n\n"
                         "Return the world-space value at coordinates (x, y, z).").c_str())
 
-                ; // py::class_<GridSampler>
+                ; // nb::class_<GridSampler>
         }
 
     private:
